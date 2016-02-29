@@ -1,4 +1,4 @@
-package parsing.cisco.pojo;
+package syslog.pojo;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,8 +13,8 @@ public class Info {
     public Info() {
     }
 
-    public Info(Set<UniversalClass> universalClasses) {
-        this.data = universalClasses;
+    public Info(Set<UniversalClass> data) {
+        this.data = data;
     }
 
     public Set<UniversalClass> getData() {

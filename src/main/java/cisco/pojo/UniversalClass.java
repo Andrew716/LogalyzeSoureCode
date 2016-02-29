@@ -1,4 +1,4 @@
-package parsing.cisco.pojo;
+package cisco.pojo;
 
 /**
  * Created by andrii on 29.02.16.

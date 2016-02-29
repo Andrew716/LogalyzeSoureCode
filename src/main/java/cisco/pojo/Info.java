@@ -1,4 +1,4 @@
-package parsing.cisco.pojo;
+package cisco.pojo;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,15 +6,15 @@ import java.util.Set;
 /**
  * Created by andrii on 29.02.16.
  */
-public class Warning {
+public class Info {
 
     private Set<UniversalClass> data = new HashSet<UniversalClass>();
 
-    public Warning() {
+    public Info() {
     }
 
-    public Warning(Set<UniversalClass> data) {
-        this.data = data;
+    public Info(Set<UniversalClass> universalClasses) {
+        this.data = universalClasses;
     }
 
     public Set<UniversalClass> getData() {

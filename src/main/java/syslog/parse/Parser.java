@@ -1,10 +1,10 @@
-package parsing.cisco.parse;
+package syslog.parse;
 
+import syslog.pojo.Info;
+import syslog.pojo.UniversalClass;
+import syslog.pojo.Severity;
 import com.google.gson.Gson;
-import parsing.cisco.pojo.Info;
-import parsing.cisco.pojo.Severity;
-import parsing.cisco.pojo.UniversalClass;
-import parsing.cisco.pojo.Warning;
+import syslog.pojo.Debug;
 
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -24,25 +24,25 @@ import java.util.regex.Pattern;
  */
 public class Parser {
 
-    public static final String REG_EX_CISCO_LOGS = "^(\\w{3}\\s\\d{1,2}\\s\\d{2}:\\d{2}:\\d{2})\\s(\\w+)\\s(\\w+)\\s(.*)$";
-    public static final String PATH_TO_CISCO_LOGS_FILE = "/home/andrii/Desktop/ciscorv220wtest";
-    public static final String PATH_TO_JSON_PARSED_FILE = "/home/andrii/Desktop/ciscojson";
+    public static final String REG_EX_SYSLOG = "^(\\w{1,3}\\s+\\d{1,2}\\s\\d{2}:\\d{2}:\\d{2})\\s(\\S+)\\s(\\S+)\\s(.*)$";
+    public static final String PATH_TO_SYSLOG_FILE = "";
+    public static final String PATH_TO_JSON_SYSLOG = "";
     public static final Logger LOGGER = Logger.getLogger("Info logging");
 
-    public static List writeDataToTempList(){
-        List<UniversalClass> universalClassList = new ArrayList<UniversalClass>();
+    public static List writeDataToList(){
+        List<UniversalClass> data = new ArrayList<UniversalClass>();
         BufferedReader bufferedReader = null;
         UniversalClass universalClass;
         try {
             String currentLine;
-            bufferedReader = new BufferedReader(new FileReader(PATH_TO_CISCO_LOGS_FILE));
+            bufferedReader = new BufferedReader(new FileReader(PATH_TO_SYSLOG_FILE));
             LOGGER.info("File exists");
             while ((currentLine = bufferedReader.readLine()) != null){
-                Pattern pattern = Pattern.compile(REG_EX_CISCO_LOGS);
+                Pattern pattern = Pattern.compile(REG_EX_SYSLOG);
                 Matcher matcher = pattern.matcher(currentLine);
                 if (matcher.find()){
                     universalClass = new UniversalClass(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4));
-                    universalClassList.add(universalClass);
+                    data.add(universalClass);
                 }
             }
             LOGGER.info("Data was added successfully to the list");
@@ -59,35 +59,45 @@ public class Parser {
                 LOGGER.log(Level.SEVERE, "PrintStackTrace exception has been generated in the method writeDataToTempList");
             }
         }
-        return universalClassList;
+        return data;
     }
 
     public static void parsingToJSON(){
-        List tempList = writeDataToTempList();
-        Info info = new Info();
-        Warning warning = new Warning();
-        for (int i = 0; i < tempList.size(); i++){
-            if (((UniversalClass)tempList.get(i)).getSeverity().equals("NTP")){
-                info.add((UniversalClass)tempList.get(i));
-            }else {
-                warning.add((UniversalClass)tempList.get(i));
-            }
-        }
-        try {
-            FileWriter fileWriter = new FileWriter(PATH_TO_JSON_PARSED_FILE);
+        try{
+            FileWriter fileWriter = new FileWriter(PATH_TO_JSON_SYSLOG);
             PrintWriter printWriter = new PrintWriter(fileWriter);
-            Severity severity = new Severity(info, warning);
-            fileWriter.write(writeToJSON(severity));
-            printWriter.println();
-            fileWriter.close();
-        } catch (IOException e) {
+            List tempList = writeDataToList();
+            Info info = new Info();
+            Debug debug = new Debug();
+            for (int i = 0; i < tempList.size(); i++){
+                if (((UniversalClass)tempList.get(i)).getService().equals("tgtd:") || ((UniversalClass)tempList.get(i)).getService().equals("proxy-server:")){
+                    info.add((UniversalClass)tempList.get(i));
+                }else {
+                    debug.add((UniversalClass)tempList.get(i));
+                }
+            }
+                Severity severity = new Severity(info, debug);
+                fileWriter.write(writeToJSON(severity));
+                printWriter.println();
+                fileWriter.close();
+            } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     private static String writeToJSON(Severity severity){
         Gson gson = new Gson();
         String json = gson.toJson(severity);
         return json;
+    }
+
+    public static void main(String[] args){
+        Pattern pattern = Pattern.compile(REG_EX_SYSLOG);
+        Matcher matcher = pattern.matcher("Jun  9 15:41:36 devstack-precise-hpcloud-b3-227769 object-replicator: Object replication complete. (0.00 minutes)");
+        if (matcher.matches()){
+            System.out.println("Hello");
+        }
+
     }
 }

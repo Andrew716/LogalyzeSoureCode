@@ -1,4 +1,4 @@
-package parsing.paloalto;
+package paloalto;
 
 /**
  * Created by andrii on 26.02.16.
