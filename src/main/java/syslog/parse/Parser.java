@@ -71,9 +71,9 @@ public class Parser {
             Debug debug = new Debug();
             for (int i = 0; i < tempList.size(); i++){
                 if (((UniversalClass)tempList.get(i)).getService().equals("tgtd:") || ((UniversalClass)tempList.get(i)).getService().equals("proxy-server:")){
-                    info.add((UniversalClass)tempList.get(i));
-                }else {
                     debug.add((UniversalClass)tempList.get(i));
+                }else {
+                    info.add((UniversalClass)tempList.get(i));
                 }
             }
                 Severity severity = new Severity(info, debug);
@@ -90,14 +90,5 @@ public class Parser {
         Gson gson = new Gson();
         String json = gson.toJson(severity);
         return json;
-    }
-
-    public static void main(String[] args){
-        Pattern pattern = Pattern.compile(REG_EX_SYSLOG);
-        Matcher matcher = pattern.matcher("Jun  9 15:41:36 devstack-precise-hpcloud-b3-227769 object-replicator: Object replication complete. (0.00 minutes)");
-        if (matcher.matches()){
-            System.out.println("Hello");
-        }
-
     }
 }
